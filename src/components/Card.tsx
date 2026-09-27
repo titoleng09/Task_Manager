@@ -2,9 +2,10 @@ import type { task } from "../type/task.ts";
 
 interface CardType {
     task : task;
+    onDelete: (id : number) => void;
 }
 
-function Card({ task }: CardType) {
+function Card({ task, onDelete }: CardType) {
 
   return (
     <div className="card bg-white w-96 shadow-sm">
@@ -29,11 +30,11 @@ function Card({ task }: CardType) {
           </div>
 
           <div className="flex gap-2">
-            <button className="btn btn-sm btn-primary bg-blue-600 text-white">
-              Complete
-            </button>
+            <button className="btn btn-sm btn-primary">
+            Edit
+          </button>
 
-            <button className="btn btn-sm btn-error text-white">
+            <button className="btn btn-sm btn-error text-white" onClick={() => onDelete(task.id)}>
               Delete
             </button>
           </div>

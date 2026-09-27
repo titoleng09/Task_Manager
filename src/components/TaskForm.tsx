@@ -1,26 +1,25 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import type { Priority, task } from "../type/task";
 
 interface TaskFormProps {
     onCreate : (task : task ) => void
 }
 
-function TaskForm ({ onCreate }: task) {
+function TaskForm ({ onCreate }: TaskFormProps) {
 
     let id = 0
-
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [priority, setPriority] = useState<Priority>("medium");
 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!title.trim()) return;
 
         const newTask: task = {
-        id: id++,
+        id : id++,
         title,
         description,
         priority,
@@ -33,6 +32,7 @@ function TaskForm ({ onCreate }: task) {
         setDescription("");
         setPriority("medium");
     };
+
 
     return (
         <form
@@ -80,7 +80,7 @@ function TaskForm ({ onCreate }: task) {
             </button>
 
         </div>
-        </form>
+    </form>
   );
 
 }
