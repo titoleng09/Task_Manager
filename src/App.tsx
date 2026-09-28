@@ -21,7 +21,6 @@ function App() {
       priority: "medium",
       completed: false
     }
-
     
   ])
 
@@ -38,6 +37,16 @@ function App() {
     );
   };
 
+  const editTask = (id: number, updatedTask: Partial<task>) => {
+    setTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        task.id === id
+          ? { ...task, ...updatedTask }
+          : task
+      )
+    );
+  };
+
 
   return (
      <main className="min-h-screen bg-base-200 p-8">
@@ -51,13 +60,14 @@ function App() {
         <TaskForm onCreate={createTask} />
 
          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-      {tasks.map((task) => (
-        <Card
-          key={task.id}
-          task={task}
-          onDelete={deleteTask}
-        />
-      ))}
+        {tasks.map((task) => (
+          <Card
+            key={task.id}
+            task={task}
+            onDelete={deleteTask}
+            onEdit={editTask}
+          />
+        ))}
     </div>
 
 
