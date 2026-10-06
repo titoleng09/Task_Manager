@@ -1,8 +1,23 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from model.BaseModel import Task
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+import os
 
-
+load_dotenv()
 app = FastAPI()
+origins = [
+    os.getenv("FRONTEND_URL"),
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 tasks = [
     {
@@ -32,7 +47,7 @@ async def health_check():
 
 @app.get("/tasks")
 def read_tasks():
-    return {"tasks": tasks.values()}
+    return {"tasks": tasks}
 
 @app.post("/tasks")
 def create_task(task : Task):
@@ -43,17 +58,27 @@ def create_task(task : Task):
         else:
             tasks.append(task.model_dump())
              
-    return { task }
-    
-    
-    
+    return task
+
+@app.patch("/tasks/{task_id}")
+def update_task(task_id : int, task : Task):
+        
+    for t in tasks:
+        if t.task_id == task.id:
+            return {"error": "Task with this ID already exists"}
+        else:
+            tasks.append(task.model_dump())
+             
+    return task
+
     
 
 @app.get("/tasks/{task_id}")
 def read_item(task_id: int, q: str | None = None):
-    if(task_id < 0):
-        return {"error": "Invalid task_id"}
-    return {"task_id": task_id, "q": q}
+    if task_id >= len(tasks):
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    return {"task_id": task_id, "q": q, "task": tasks[task_id]}
 
 
 
