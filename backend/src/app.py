@@ -71,7 +71,6 @@ def update_task(task_id : int, task : Task):
              
     return task
 
-    
 
 @app.get("/tasks/{task_id}")
 def read_item(task_id: int, q: str | None = None):
