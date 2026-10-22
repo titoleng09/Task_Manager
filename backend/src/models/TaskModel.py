@@ -1,17 +1,11 @@
 from typing import List
 from typing import Optional
-from sqlalchemy import ForeignKey
 from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
 from enum import Enum
 from sqlalchemy import String, Boolean, Enum as SQLAlchemyEnum
-
-
-class Base(DeclarativeBase):
-    pass
+from database.db import Base
 
 
 class Priority(str, Enum):
@@ -37,11 +31,3 @@ class Task(Base):
             f"Task(id={self.id!r}, title={self.title!r}, "
             f"priority={self.priority.value!r})"
         )
-        
-        
-task = Task(
-    title="Learn FastAPI",
-    description="Connect FastAPI to MySQL",
-    priority=Priority.high
-)
-
