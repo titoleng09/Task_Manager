@@ -4,31 +4,38 @@ import type { task } from "./type/task";
 import TaskForm from './components/TaskForm.tsx';
 import { useState } from 'react';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 function App() {
 
-  const [tasks, setTasks] = useState<task[]>([
-     {
-      id: 1,
-      title: "Learn TypeScript",
-      description: "Study interfaces",
-      priority: "high",
-      completed: false
-    },
-    {
-      id: 2,
-      title: "Build Task Manager",
-      description: "Create React UI",
-      priority: "medium",
-      completed: false
-    }
-    
-  ])
+  const [tasks, setTasks] = useState<task[]>([])
 
-  const createTask = (task: task) => {
+  const createTask = async (task: Omit<task, "id">): Promise<task> => {
+    const response = await fetch(`${API_BASE_URL}/tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(task),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend request failed (${response.status} ${response.statusText}).`);
+    }
+
+    const createdTask: Omit<task, "description"> & { description: string | null } =
+      await response.json();
+    const normalizedTask: task = {
+      ...createdTask,
+      description: createdTask.description ?? "",
+    };
+
     setTasks((currentTasks) => [
       ...currentTasks,
-      task
+      normalizedTask,
     ]);
+
+    return normalizedTask;
   };
 
   const deleteTask = (id: number) => {

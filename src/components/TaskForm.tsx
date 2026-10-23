@@ -2,35 +2,42 @@ import { useState, type FormEvent } from "react";
 import type { Priority, task } from "../type/task";
 
 interface TaskFormProps {
-    onCreate : (task : task ) => void
+    onCreate: (task: Omit<task, "id">) => Promise<task>;
 }
 
 function TaskForm ({ onCreate }: TaskFormProps) {
 
-    let id = 0
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [priority, setPriority] = useState<Priority>("medium");
+    const [error, setError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!title.trim()) return;
+        if (!title.trim() || isSubmitting) return;
 
-        const newTask: task = {
-        id : id++,
-        title,
-        description,
-        priority,
-        completed: false
-        };
+        setError("");
+        setIsSubmitting(true);
 
-        onCreate(newTask);
+        try {
+            await onCreate({
+                title: title.trim(),
+                description,
+                priority,
+                completed: false,
+            });
 
-        setTitle("");
-        setDescription("");
-        setPriority("medium");
+            setTitle("");
+            setDescription("");
+            setPriority("medium");
+        } catch (error) {
+            setError(error instanceof Error ? error.message : "Failed to create task.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
 
@@ -49,6 +56,8 @@ function TaskForm ({ onCreate }: TaskFormProps) {
                 type="text"
                 placeholder="Task title"
                 className="input input-bordered w-full"
+                maxLength={30}
+                required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
             />
@@ -59,6 +68,8 @@ function TaskForm ({ onCreate }: TaskFormProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
             />
+
+            {error && <p className="text-error" role="alert">{error}</p>}
 
             <select
                 className="select select-bordered w-full"
@@ -75,8 +86,9 @@ function TaskForm ({ onCreate }: TaskFormProps) {
             <button
                 type="submit"
                 className="btn btn-primary mt-4"
+                disabled={isSubmitting}
                 >
-                Create Task
+                {isSubmitting ? "Creating..." : "Create Task"}
             </button>
 
         </div>
@@ -86,4 +98,3 @@ function TaskForm ({ onCreate }: TaskFormProps) {
 }
 
 export default TaskForm;
-

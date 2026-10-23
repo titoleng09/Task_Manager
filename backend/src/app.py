@@ -80,7 +80,6 @@ def update_task(
 
     for field, value in update_data.items():
         setattr(task, field, value)
-
     db.commit()
     db.refresh(task)
 
